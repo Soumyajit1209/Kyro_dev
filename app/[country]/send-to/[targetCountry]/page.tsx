@@ -14,119 +14,6 @@ import { getCountryByCode, getCountryCurrency } from "@/data/countries";
 import type { SendMoneyPage } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 
-// Sample data (until Sanity integration is complete)
-const demoData: SendMoneyPage = {
-  sourceCountry: "us",
-  targetCountry: "in",
-  title: "Send Money from USA to India | Kyro",
-  subtitle: "Fast, secure money transfers from the United States to India",
-  hero: {
-    heading: "Send Money from USA to India",
-    subheading: "Fast transfers with great exchange rates and low fees",
-    image: {
-      _type: "image",
-      asset: {
-        _ref: "image-123",
-        _type: "reference"
-      },
-      alt: "USA to India money transfer"
-    },
-    ctaText: "Get Started",
-    ctaLink: "#calculator"
-  },
-  calculator: {
-    defaultAmount: 1000,
-    fee: 3.99,
-    exchangeRate: 83.5, // USD to INR
-    deliveryOptions: [
-      {
-        _key: "option1",
-        name: "Bank Transfer",
-        duration: "Within 24 hours",
-        fee: 3.99
-      },
-      {
-        _key: "option2",
-        name: "Cash Pickup",
-        duration: "Within 30 minutes",
-        fee: 4.99
-      },
-      {
-        _key: "option3",
-        name: "Mobile Wallet",
-        duration: "Instant",
-        fee: 2.99
-      }
-    ]
-  },
-  benefitBanners: [
-    {
-      _key: "benefit1",
-      title: "Guaranteed Best Rates",
-      description: "We match or beat any competitor's exchange rate",
-      icon: "Percent"
-    },
-    {
-      _key: "benefit2",
-      title: "Fast Delivery",
-      description: "Money typically arrives within minutes",
-      icon: "Clock"
-    },
-    {
-      _key: "benefit3",
-      title: "Secure Transfers",
-      description: "Bank-level encryption protects your money",
-      icon: "BadgeCheck"
-    },
-    {
-      _key: "benefit4",
-      title: "Multiple Payment Options",
-      description: "Pay with bank transfer, card, or digital wallet",
-      icon: "CreditCard"
-    }
-  ],
-  faqs: [
-    {
-      _key: "faq1",
-      question: "How long does it take to send money from USA to India?",
-      answer: "Most transfers arrive within minutes to a few hours. Bank transfers may take up to 24 hours during business days."
-    },
-    {
-      _key: "faq2",
-      question: "What's the maximum amount I can send?",
-      answer: "You can send up to $10,000 per transaction and up to $30,000 per month, depending on verification level."
-    },
-    {
-      _key: "faq3",
-      question: "What information do I need to send money to India?",
-      answer: "You'll need your recipient's full name, bank account number, IFSC code (for bank transfers), or mobile number (for wallet transfers)."
-    },
-    {
-      _key: "faq4",
-      question: "Is there a minimum amount I can send?",
-      answer: "The minimum transfer amount is $10 or equivalent."
-    },
-    {
-      _key: "faq5",
-      question: "Are there any documents required to send money?",
-      answer: "For amounts over $1,000, you may need to provide ID verification and information about the source of funds."
-    }
-  ],
-  seo: {
-    title: "Send Money from USA to India | Best Rates | Kyro",
-    description: "Fast and secure money transfers from USA to India with competitive exchange rates and low fees. Send money to bank accounts, cash pickup, or mobile wallets.",
-    keywords: ["send money to India", "USA to India transfer", "remittance", "rupee transfer"],
-    ogImage: {
-      _type: "image",
-      asset: {
-        _ref: "image-seo",
-        _type: "reference"
-      }
-    }
-  }
-};
-
-// Generate static params for static site generation
 export async function generateStaticParams() {
   return [
     { country: 'us', targetCountry: 'in' },
@@ -204,36 +91,19 @@ async function getPageData(sourceCountry: string, targetCountry: string) {
   try {
     // For demo purposes, return the demo data
     // In production, uncomment the following to fetch from Sanity
-    /*
+    
     const data = await client.fetch(sendMoneyPageQuery, { 
       sourceCountry, 
       targetCountry 
     });
     
     return data;
-    */
+    
     
     // Return demo data with updated country codes
-    return { 
-      ...demoData,
-      sourceCountry,
-      targetCountry,
-      // Update hero content based on countries
-      hero: {
-        ...demoData.hero,
-        heading: `Send Money from ${getCountryByCode(sourceCountry)?.name || 'USA'} to ${getCountryByCode(targetCountry)?.name || 'India'}`,
-        subheading: `Fast transfers with great exchange rates and low fees`
-      },
-      // Update SEO based on countries
-      seo: {
-        ...demoData.seo,
-        title: `Send Money from ${getCountryByCode(sourceCountry)?.name || 'USA'} to ${getCountryByCode(targetCountry)?.name || 'India'} | Kyro`,
-        description: `Fast and secure money transfers from ${getCountryByCode(sourceCountry)?.name || 'USA'} to ${getCountryByCode(targetCountry)?.name || 'India'} with competitive exchange rates and low fees.`
-      }
-    };
   } catch (error) {
     console.error("Error fetching data from Sanity:", error);
-    return { ...demoData, sourceCountry, targetCountry };
+    return { sourceCountry, targetCountry };
   }
 }
 
@@ -360,7 +230,7 @@ export default async function SendMoneyPage({
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {pageData.benefitBanners.map((benefit) => (
+            {pageData.benefitBanners.map((benefit: SendMoneyPage["benefitBanners"][number]) => (
               <Card key={benefit._key} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg hover:-translate-y-2">
                 <CardContent className="pt-8 pb-6">
                   <div className="flex flex-col items-center text-center space-y-4">
@@ -417,7 +287,8 @@ export default async function SendMoneyPage({
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {pageData.calculator.deliveryOptions.map((option) => (
+            {pageData.calculator.deliveryOptions.map(
+              (option: SendMoneyPage["calculator"]["deliveryOptions"][number]) => (
               <Card key={option._key} className="border border-gray-200 dark:border-gray-800 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
                 <CardHeader className="text-center pb-4">
                   <CardTitle className="text-2xl group-hover:text-blue-600 transition-colors duration-300">{option.name}</CardTitle>
