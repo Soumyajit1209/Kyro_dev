@@ -98,7 +98,7 @@ export const sendMoneyPageQuery = `
 `;
 
 export const countriesListQuery = `
-  *[_type == "country"] {
+  *[_type == "country"] | order(name asc) {
     code,
     name,
     flag,

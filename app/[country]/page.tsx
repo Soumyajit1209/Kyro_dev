@@ -11,325 +11,161 @@ import { TestimonialsCarousel } from "@/components/testimonials-carousel";
 import { FAQAccordion } from "@/components/faq-accordion";
 import { BlogPreviewCard } from "@/components/blog-preview-card";
 import { client } from "@/lib/sanity";
-import { homePageQuery, blogPostsQuery } from "@/lib/queries";
+import { homePageQuery, blogPostsQuery, countriesListQuery } from "@/lib/queries";
 import { getCountryByCode } from "@/data/countries";
-import { urlFor } from "@/lib/sanity";
 import { HomePage, BlogPost } from "@/types";
 
-// Generate static params for static site generation
+// Force dynamic rendering for real-time data
+export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Disable ISR caching
+
+// Generate static params for available countries only
 export async function generateStaticParams() {
-  return [
-    { country: 'us' },
-    { country: 'in' },
-    { country: 'gb' },
-    { country: 'ca' },
-    { country: 'au' },
-  ];
+  try {
+    // Fetch available countries from Sanity CMS
+    const countries = await client.fetch(countriesListQuery);
+    return countries
+      .filter((c: any) => c.isAvailable)
+      .map((c: any) => ({ country: c.code.toLowerCase() }));
+  } catch (error) {
+    console.error("Error fetching countries for static params:", error);
+    return [];
+  }
 }
 
-// Generate metadata for the page
+// Generate metadata dynamically based on CMS data
 export async function generateMetadata({ 
   params 
 }: { 
   params: { country: string } 
 }): Promise<Metadata> {
-  const country = getCountryByCode(params.country);
-  if (!country) return notFound();
+  const countryCode = params.country.toLowerCase();
   
-  const { pageData } = await getPageData(params.country);
-  const countryName = country.name;
-  const seo = pageData?.seo || {};
-
-  return {
-    title: seo.title || `Send money from ${countryName} | Kyro`,
-    description: seo.description || `Send money from ${countryName} with Kyro. Fast, secure, and low fees.`,
-    keywords: seo.keywords || ["money transfer", "send money", countryName],
-    openGraph: {
-      title: seo.title || `Send money from ${countryName} | Kyro`,
-      description: seo.description || `Send money from ${countryName} with Kyro. Fast, secure, and low fees.`,
-      images: [
-        {
-          url: seo.ogImage ? urlFor(seo.ogImage).url() : '/og-image.jpg',
-          width: 1200,
-          height: 630,
-          alt: `Send money from ${countryName}`,
+  try {
+    const pageData = await client.fetch(homePageQuery, { country: countryCode });
+    
+    if (pageData?.seo) {
+      return {
+        title: pageData.seo.title,
+        description: pageData.seo.description,
+        keywords: pageData.seo.keywords,
+        openGraph: {
+          title: pageData.seo.title,
+          description: pageData.seo.description,
+          images: pageData.seo.ogImage ? [pageData.seo.ogImage] : [],
         },
-      ],
-      locale: 'en_US',
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: seo.title || `Send money from ${countryName} | Kyro`,
-      description: seo.description || `Send money from ${countryName} with Kyro. Fast, secure, and low fees.`,
-      images: [seo.ogImage ? urlFor(seo.ogImage).url() : '/og-image.jpg'],
-    },
-    alternates: {
-      canonical: `https://kyro.com/${params.country}`,
-    },
+      };
+    }
+  } catch (error) {
+    console.error("Error generating metadata:", error);
+  }
+  
+  // Fallback metadata
+  const country = getCountryByCode(countryCode);
+  return {
+    title: `Money Transfer Services - ${country?.name || 'Country'} | Kyro`,
+    description: `Send money internationally from ${country?.name || 'your country'} with competitive rates and low fees.`,
   };
 }
 
-// Sample data (until Sanity integration is complete)
-const demoData: HomePage = {
-  country: "us",
-  title: "Fast & Secure Money Transfers | Kyro",
-  subtitle: "Send money globally with competitive rates and low fees",
-  hero: {
-    heading: "Send Money Abroad Quickly & Securely",
-    subheading: "Transfer money to friends and family worldwide with great rates and low fees",
-    image: {
-      _type: "image",
-      asset: {
-        _ref: "image-123",
-        _type: "reference"
-      },
-      alt: "Global money transfer"
-    },
-    ctaText: "Get Started",
-    ctaLink: "/us/send-money"
-  },
-  features: [
-    {
-      title: "Trusted Worldwide",
-      description: "Over 10 million customers trust us for international transfers",
-      icon: "Landmark"
-    },
-    {
-      title: "Bank-Level Security",
-      description: "Your money and data are protected with advanced encryption",
-      icon: "Shield"
-    },
-    {
-      title: "Fast Transfers",
-      description: "Money arrives within minutes for most destinations",
-      icon: "Clock"
-    },
-    {
-      title: "Competitive Rates",
-      description: "Get the best exchange rates with low, transparent fees",
-      icon: "TrendingUp"
-    }
-  ],
-  banners: [
-    {
-      _key: "banner1",
-      title: "No Hidden Fees",
-      subtitle: "We're transparent about our fees. What you see is what you pay.",
-      image: {
-        _type: "image",
-        asset: {
-          _ref: "image-456",
-          _type: "reference"
-        }
-      },
-      ctaText: "Learn More",
-      ctaLink: "/us/fees",
-      backgroundColor: "bg-blue-50 dark:bg-blue-950"
-    },
-    {
-      _key: "banner2",
-      title: "Send Money to India",
-      subtitle: "Great rates, fast delivery, and multiple payout options.",
-      image: {
-        _type: "image",
-        asset: {
-          _ref: "image-789",
-          _type: "reference"
-        }
-      },
-      ctaText: "Send Now",
-      ctaLink: "/us/send-to/in",
-      backgroundColor: "bg-green-50 dark:bg-green-950"
-    }
-  ],
-  exchangeRates: [
-    {
-      _key: "rate1",
-      sourceCurrency: "USD",
-      targetCurrency: "INR",
-      rate: 83.5,
-      lastUpdated: new Date().toISOString()
-    },
-    {
-      _key: "rate2",
-      sourceCurrency: "USD",
-      targetCurrency: "GBP",
-      rate: 0.785,
-      lastUpdated: new Date().toISOString()
-    },
-    {
-      _key: "rate3",
-      sourceCurrency: "USD",
-      targetCurrency: "EUR",
-      rate: 0.92,
-      lastUpdated: new Date().toISOString()
-    },
-    {
-      _key: "rate4",
-      sourceCurrency: "USD",
-      targetCurrency: "PHP",
-      rate: 57.23,
-      lastUpdated: new Date().toISOString()
-    }
-  ],
-  testimonials: [
-    {
-      _key: "testimonial1",
-      name: "Sarah Johnson",
-      quote: "I've been using Kyro for sending money to my family in India for over a year now. The transfers are consistently fast, and the rates are better than my bank.",
-      rating: 5,
-      location: "California, USA",
-      image: {
-        _type: "image",
-        asset: {
-          _ref: "image-abc",
-          _type: "reference"
-        }
-      }
-    },
-    {
-      _key: "testimonial2",
-      name: "David Chen",
-      quote: "The app is so easy to use. I can send money to my parents in minutes, and they receive it directly in their bank account. Highly recommend!",
-      rating: 5,
-      location: "New York, USA",
-      image: {
-        _type: "image",
-        asset: {
-          _ref: "image-def",
-          _type: "reference"
-        }
-      }
-    },
-    {
-      _key: "testimonial3",
-      name: "Maria Rodriguez",
-      quote: "Customer service is excellent. When I had an issue with my transfer, they resolved it immediately. The best money transfer service I've used.",
-      rating: 4,
-      location: "Texas, USA",
-      image: {
-        _type: "image",
-        asset: {
-          _ref: "image-ghi",
-          _type: "reference"
-        }
-      }
-    }
-  ],
-  faqs: [
-    {
-      _key: "faq1",
-      question: "How long does it take to send money?",
-      answer: "Most transfers arrive within minutes, though some destinations and payment methods may take 1-2 business days."
-    },
-    {
-      _key: "faq2",
-      question: "What are the fees for sending money?",
-      answer: "Our fees depend on the amount sent, destination country, and payment method. You'll always see the exact fee before confirming your transfer."
-    },
-    {
-      _key: "faq3",
-      question: "Is Kyro safe to use?",
-      answer: "Yes, Kyro uses bank-level encryption and security protocols to protect your data and money. We're also regulated in all countries where we operate."
-    },
-    {
-      _key: "faq4",
-      question: "What payment methods can I use?",
-      answer: "You can pay for transfers using bank transfers, debit cards, credit cards, and digital wallets depending on your country."
-    },
-    {
-      _key: "faq5",
-      question: "How do I track my transfer?",
-      answer: "Once you send money, you'll receive updates via email and SMS. You can also track your transfer in real-time through our app or website."
-    }
-  ],
-  seo: {
-    title: "Fast & Secure Money Transfers | Kyro",
-    description: "Send money globally with competitive rates and low fees. Fast, secure international transfers to 100+ countries.",
-    keywords: ["money transfer", "send money", "international transfer", "remittance"],
-    ogImage: {
-      _type: "image",
-      asset: {
-        _ref: "image-seo",
-        _type: "reference"
-      }
-    }
-  }
-};
-
-const demoBlogPosts: BlogPost[] = [
-  {
-    _id: "blog1",
-    title: "5 Tips for Saving Money on International Transfers",
-    slug: { current: "saving-money-international-transfers" },
-    excerpt: "Learn how to reduce fees and get better exchange rates when sending money abroad.",
-    mainImage: {
-      _type: "image",
-      asset: {
-        _ref: "image-blog1",
-        _type: "reference"
-      }
-    },
-    publishedAt: new Date().toISOString(),
-    categories: [{ title: "Money Tips" }, { title: "International Transfers" }]
-  },
-  {
-    _id: "blog2",
-    title: "Understanding Currency Fluctuations: What Affects Your Transfer Rate",
-    slug: { current: "understanding-currency-fluctuations" },
-    excerpt: "An in-depth look at how global events and market forces impact currency exchange rates.",
-    mainImage: {
-      _type: "image",
-      asset: {
-        _ref: "image-blog2",
-        _type: "reference"
-      }
-    },
-    publishedAt: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
-    categories: [{ title: "Finance" }, { title: "Currency Exchange" }]
-  },
-  {
-    _id: "blog3",
-    title: "The Future of International Money Transfers",
-    slug: { current: "future-international-money-transfers" },
-    excerpt: "How technology is transforming the way we send money across borders.",
-    mainImage: {
-      _type: "image",
-      asset: {
-        _ref: "image-blog3",
-        _type: "reference"
-      }
-    },
-    publishedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
-    categories: [{ title: "Technology" }, { title: "Industry Trends" }]
-  }
-];
-
-async function getPageData(countryCode: string) {
+// Function to check if country exists in CMS and fetch data
+async function getCountryPageData(countryCode: string) {
   try {
-    const data = await client.fetch(homePageQuery, { 
-      country: countryCode 
-    });
+    // First check if country exists in CMS countries list
+    const countries = await client.fetch(countriesListQuery);
+    const countryExists = countries.find((c: any) => 
+      c.code.toLowerCase() === countryCode.toLowerCase() && c.isAvailable
+    );
     
-    const blogPosts = await client.fetch(blogPostsQuery, {
-      country: countryCode
-    });
+    if (!countryExists) {
+      return { 
+        exists: false, 
+        pageData: null, 
+        blogPosts: [], 
+        countryInfo: null 
+      };
+    }
     
-    return { pageData: data, blogPosts };
+    // Fetch homepage data for the country
+    const [pageData, blogPosts] = await Promise.all([
+      client.fetch(homePageQuery, { country: countryCode }),
+      client.fetch(blogPostsQuery, { country: countryCode })
+    ]);
     
-    // Return demo data
     return { 
-      pageData: { ...demoData, country: countryCode }, 
-      blogPosts: demoBlogPosts 
+      exists: true, 
+      pageData, 
+      blogPosts: blogPosts || [], 
+      countryInfo: countryExists 
     };
   } catch (error) {
-    console.error("Error fetching data from Sanity:", error);
+    console.error("Error fetching country data:", error);
     return { 
-      pageData: { ...demoData, country: countryCode }, 
-      blogPosts: demoBlogPosts 
+      exists: false, 
+      pageData: null, 
+      blogPosts: [], 
+      countryInfo: null 
     };
   }
+}
+
+// Content Not Available Component
+function ContentNotAvailable({ countryName }: { countryName: string }) {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
+      <div className="container py-20 text-center">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-8">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+              <Landmark className="w-12 h-12 text-gray-400" />
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Service Not Available
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
+              We&apos;re not currently serving {countryName} yet, but we&apos;re working on expanding our services.
+            </p>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-lg border border-gray-200 dark:border-gray-700">
+            <h2 className="text-2xl font-semibold mb-4">Get Notified When We Launch</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Be the first to know when Kyro becomes available in {countryName}.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              />
+              <Button className="px-6 py-2">
+                Notify Me
+              </Button>
+            </div>
+          </div>
+          
+          <div className="mt-12">
+            <h3 className="text-lg font-semibold mb-4">Available Countries</h3>
+            <div className="flex flex-wrap justify-center gap-2">
+              <Button variant="outline" asChild>
+                <Link href="/us">🇺🇸 United States</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/gb">🇬🇧 United Kingdom</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/ca">🇨🇦 Canada</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/au">🇦🇺 Australia</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default async function CountryHomePage({ 
@@ -340,20 +176,25 @@ export default async function CountryHomePage({
   const countryCode = params.country.toLowerCase();
   const country = getCountryByCode(countryCode);
   
-  // If country doesn't exist in our list, return 404
+  // If country doesn't exist in our predefined list, return 404
   if (!country) {
     return notFound();
   }
   
-  const { pageData, blogPosts } = await getPageData(countryCode);
+  // Fetch real-time data from CMS
+  const { exists, pageData, blogPosts, countryInfo } = await getCountryPageData(countryCode);
   
-  // Defensive: fallback to empty arrays if any section is missing
-  const features = pageData.features ?? [];
-  const banners = pageData.banners ?? [];
-  const exchangeRates = pageData.exchangeRates ?? [];
-  const testimonials = pageData.testimonials ?? [];
-  const faqs = pageData.faqs ?? [];
-  const blogPostsSafe = blogPosts ?? [];
+  // If country doesn't exist in CMS or is not available, show content not available
+  if (!exists || !pageData) {
+    return <ContentNotAvailable countryName={country.name} />;
+  }
+  
+  // Defensive: fallback empty arrays for missing sections
+  const features = pageData.features || [];
+  const banners = pageData.banners || [];
+  const exchangeRates = pageData.exchangeRates || [];
+  const testimonials = pageData.testimonials || [];
+  const faqs = pageData.faqs || [];
 
   // Define icon components for features
   const iconComponents = {
@@ -371,14 +212,14 @@ export default async function CountryHomePage({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div className="text-center lg:text-left">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-                {pageData.hero.heading}
+                {pageData.hero?.heading || `Send Money from ${country.name}`}
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-                {pageData.hero.subheading}
+                {pageData.hero?.subheading || `Transfer money internationally from ${country.name} with competitive rates and low fees`}
               </p>
               <Button asChild size="lg" className="rounded-full px-8">
-                <Link href={pageData.hero.ctaLink || "#"}>
-                  {pageData.hero.ctaText}
+                <Link href={pageData.hero?.ctaLink || `/${countryCode}/send-money`}>
+                  {pageData.hero?.ctaText || "Get Started"}
                 </Link>
               </Button>
             </div>
@@ -394,100 +235,114 @@ export default async function CountryHomePage({
       </section>
       
       {/* Features Section */}
-      <section className="py-16 bg-white dark:bg-gray-950">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold">Why Choose Kyro</h2>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">
-              The smarter way to send money internationally
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {(features as Array<{title: string; description: string; icon: string}>).map((feature, index) => (
-              <div 
-                key={index} 
-                className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg text-center"
-              >
-                <div className="flex justify-center mb-4">
-                  {iconComponents[feature.icon as keyof typeof iconComponents]}
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      
-      {/* Banner Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900">
-        <div className="container space-y-16">
-          {(banners as Array<{_key: string; title: string; subtitle: string; image: any; ctaText: string; ctaLink: string; backgroundColor: string}>).map((banner) => (
-            <BannerCard
-              key={banner._key}
-              title={banner.title}
-              subtitle={banner.subtitle}
-              image={banner.image}
-              ctaText={banner.ctaText}
-              ctaLink={banner.ctaLink || "#"}
-              backgroundColor={banner.backgroundColor}
-              direction={banner._key === "banner1" ? "row" : "row-reverse"}
-            />
-          ))}
-        </div>
-      </section>
-      
-      {/* Exchange Rates & Testimonials Section */}
-      <section className="py-16 bg-white dark:bg-gray-950">
-        <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            <div className="lg:col-span-2">
-              <ExchangeRateCard rates={exchangeRates} />
+      {features.length > 0 && (
+        <section className="py-16 bg-white dark:bg-gray-950">
+          <div className="container">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold">Why Choose Kyro</h2>
+              <p className="text-gray-600 dark:text-gray-300 mt-2">
+                The smarter way to send money internationally
+              </p>
             </div>
             
-            <div className="lg:col-span-3">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold">What Our Customers Say</h2>
-              </div>
-              <TestimonialsCarousel testimonials={testimonials} />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {features.map((feature: any, index: number) => (
+                <div 
+                  key={index} 
+                  className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg text-center"
+                >
+                  <div className="flex justify-center mb-4">
+                    {iconComponents[feature.icon as keyof typeof iconComponents]}
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
       
-      {/* FAQs Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900">
-        <div className="container max-w-3xl">
-          <FAQAccordion faqs={faqs} />
-        </div>
-      </section>
-      
-      {/* Blog Section */}
-      <section className="py-16 bg-white dark:bg-gray-950">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold">Latest Articles</h2>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">
-              Tips and insights about international money transfers
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {(blogPostsSafe as import("@/types").BlogPost[]).map((post) => (
-              <BlogPreviewCard key={post._id} post={post} />
+      {/* Banner Section */}
+      {banners.length > 0 && (
+        <section className="py-16 bg-gray-50 dark:bg-gray-900">
+          <div className="container space-y-16">
+            {banners.map((banner: any, index: number) => (
+              <BannerCard
+                key={banner._key}
+                title={banner.title}
+                subtitle={banner.subtitle}
+                image={banner.image}
+                ctaText={banner.ctaText}
+                ctaLink={banner.ctaLink}
+                backgroundColor={banner.backgroundColor}
+                direction={index % 2 === 0 ? "row" : "row-reverse"}
+              />
             ))}
           </div>
-          
-          <div className="text-center mt-12">
-            <Button variant="outline" asChild>
-              <Link href={`/${countryCode}/blog`}>View All Articles</Link>
-            </Button>
+        </section>
+      )}
+      
+      {/* Exchange Rates & Testimonials Section */}
+      {(exchangeRates.length > 0 || testimonials.length > 0) && (
+        <section className="py-16 bg-white dark:bg-gray-950">
+          <div className="container">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+              {exchangeRates.length > 0 && (
+                <div className="lg:col-span-2">
+                  <ExchangeRateCard rates={exchangeRates} />
+                </div>
+              )}
+              
+              {testimonials.length > 0 && (
+                <div className={exchangeRates.length > 0 ? "lg:col-span-3" : "lg:col-span-5"}>
+                  <div className="text-center mb-8">
+                    <h2 className="text-2xl font-bold">What Our Customers Say</h2>
+                  </div>
+                  <TestimonialsCarousel testimonials={testimonials} />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+      
+      {/* FAQs Section */}
+      {faqs.length > 0 && (
+        <section className="py-16 bg-gray-50 dark:bg-gray-900">
+          <div className="container max-w-3xl">
+            <FAQAccordion faqs={faqs} />
+          </div>
+        </section>
+      )}
+      
+      {/* Blog Section */}
+      {blogPosts.length > 0 && (
+        <section className="py-16 bg-white dark:bg-gray-950">
+          <div className="container">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold">Latest Articles</h2>
+              <p className="text-gray-600 dark:text-gray-300 mt-2">
+                Tips and insights about international money transfers
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {blogPosts.map((post: any) => (
+                <BlogPreviewCard key={post._id} post={post} />
+              ))}
+            </div>
+            
+            <div className="text-center mt-12">
+              <Button variant="outline" asChild>
+                <Link href={`/${countryCode}/blog`}>View All Articles</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -9,23 +11,28 @@ import { CurrencyCalculator } from "@/components/currency/currency-calculator";
 import { FAQAccordion } from "@/components/faq-accordion";
 import { client } from "@/lib/sanity";
 import { urlFor } from "@/lib/sanity";
-import { sendMoneyPageQuery } from "@/lib/queries";
+import { sendMoneyPageQuery, countriesListQuery } from "@/lib/queries";
 import { getCountryByCode, getCountryCurrency } from "@/data/countries";
 import type { SendMoneyPage } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 
 export async function generateStaticParams() {
-  return [
-    { country: 'us', targetCountry: 'in' },
-    { country: 'us', targetCountry: 'gb' },
-    { country: 'in', targetCountry: 'us' },
-    { country: 'gb', targetCountry: 'us' },
-    // Add favicon param for static export
-    { country: 'favicon.ico', targetCountry: '' },
-  ];
+  // Fetch available countries from Sanity
+  const countries = await client.fetch(countriesListQuery);
+  // Generate all valid pairs (excluding self-pairs)
+  const pairs = [];
+  for (const source of countries) {
+    if (!source.isAvailable) continue;
+    for (const target of countries) {
+      if (!target.isAvailable) continue;
+      if (source.code !== target.code) {
+        pairs.push({ country: source.code, targetCountry: target.code });
+      }
+    }
+  }
+  return pairs;
 }
 
-// Generate metadata for the page
 export async function generateMetadata({ 
   params 
 }: { 
@@ -37,7 +44,6 @@ export async function generateMetadata({
   const sourceCountry = getCountryByCode(sourceCountryCode);
   const targetCountry = getCountryByCode(targetCountryCode);
 
-  // Only call getPageData if both params are valid strings
   let pageData = null;
   if (sourceCountryCode && targetCountryCode) {
     pageData = await getPageData(sourceCountryCode, targetCountryCode);
@@ -85,12 +91,8 @@ export async function generateMetadata({
     },
   };
 }
-
-// Function to fetch data from Sanity
 async function getPageData(sourceCountry: string, targetCountry: string) {
   try {
-    // For demo purposes, return the demo data
-    // In production, uncomment the following to fetch from Sanity
     
     const data = await client.fetch(sendMoneyPageQuery, { 
       sourceCountry, 
@@ -99,8 +101,6 @@ async function getPageData(sourceCountry: string, targetCountry: string) {
     
     return data;
     
-    
-    // Return demo data with updated country codes
   } catch (error) {
     console.error("Error fetching data from Sanity:", error);
     return { sourceCountry, targetCountry };
@@ -118,7 +118,6 @@ export default async function SendMoneyPage({
   const sourceCountry = getCountryByCode(sourceCountryCode);
   const targetCountry = getCountryByCode(targetCountryCode);
   
-  // If either country doesn't exist in our list, return 404
   if (!sourceCountry || !targetCountry) {
     return notFound();
   }
