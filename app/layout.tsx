@@ -6,7 +6,11 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 
-const inter = Inter({ subsets: ['latin'], display: 'swap' });
+const inter = Inter({ 
+  subsets: ['latin'], 
+  display: 'swap',
+  variable: '--font-inter'
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kyro.com'),
@@ -65,6 +69,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://kyro.com',
   },
+  colorScheme: 'dark light',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' }
+  ]
 };
 
 export default function RootLayout({
@@ -73,21 +82,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="dark">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
+        <meta name="color-scheme" content="dark light" />
       </head>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.className} antialiased min-h-screen bg-background text-foreground`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="dark"
           enableSystem
+          disableTransitionOnChange={false}
         >
-          <div className="flex min-h-screen flex-col">
+          <div className="relative flex min-h-screen flex-col bg-background">
             <Header />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 relative">{children}</main>
             <Footer />
           </div>
           <Toaster />
