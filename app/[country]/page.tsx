@@ -286,16 +286,21 @@ export default async function CountryHomePage({
             </div>
             <div className="space-y-20 w-full max-w-6xl mx-auto flex flex-col items-center">
               {banners.map((banner: any, index: number) => (
-                <div key={banner._key} className="transition-all duration-500 ease-in-out animate-fade-in-up w-full flex justify-center">
-                  <BannerCard
-                    title={banner.title}
-                    subtitle={banner.subtitle}
-                    image={banner.image}
-                    ctaText={banner.ctaText}
-                    ctaLink={banner.ctaLink}
-                    backgroundColor={banner.backgroundColor || 'linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%)'}
-                    direction={index % 2 === 0 ? "row" : "row-reverse"}
-                  />
+                <div
+                  key={banner._key}
+                  className="transition-all duration-500 ease-in-out animate-fade-in-up w-full flex justify-center"
+                >
+                  <div className="w-full rounded-3xl bg-white/60 dark:bg-gray-900 shadow-2xl border border-blue-100 dark:border-gray-800 backdrop-blur-lg p-2 md:p-4 hover:scale-[1.02] hover:shadow-3xl transition-transform duration-300">
+                    <BannerCard
+                      title={banner.title}
+                      subtitle={banner.subtitle}
+                      image={banner.image}
+                      ctaText={banner.ctaText}
+                      ctaLink={banner.ctaLink}
+                      backgroundColor={banner.backgroundColor || 'linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%)'}
+                      direction={index % 2 === 0 ? "row" : "row-reverse"}
+                    />
+                  </div>
                 </div>
               ))}
             </div>

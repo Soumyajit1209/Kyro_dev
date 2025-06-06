@@ -29,7 +29,7 @@ export function BannerCard({
   imageUrl,
   ctaText,
   ctaLink,
-  backgroundColor = "bg-blue-50 dark:bg-blue-950",
+  backgroundColor = "bg-blue-50 dark:bg-grey-900",
   direction = "row",
   className,
   priority = false,
