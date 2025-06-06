@@ -244,7 +244,7 @@ export default async function CountryHomePage({
 
       {/* Features Section */}
       {features.length > 0 && (
-        <section className="py-20 bg-gradient-to-r from-blue-100 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <section className="py-20 bg-gradient-to-r from-blue-100 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex flex-col items-center">
           <div className="container flex flex-col items-center">
             <div className="text-center mb-14">
               <h2 className="text-3xl md:text-4xl font-bold text-blue-900 dark:text-white mb-2">Why Choose Kyro</h2>
@@ -252,7 +252,7 @@ export default async function CountryHomePage({
                 The smarter way to send money internationally
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 w-full max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 w-full max-w-6xl mx-auto justify-items-center">
               {features.map((feature: any, index: number) => (
                 <div 
                   key={index} 
@@ -274,7 +274,7 @@ export default async function CountryHomePage({
       
       {/* Banner Section */}
       {banners.length > 0 && (
-        <section className="relative py-24 bg-gradient-to-l from-blue-100 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 overflow-hidden">
+        <section className="relative py-24 bg-gradient-to-l from-blue-100 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 overflow-hidden flex flex-col items-center">
           <div className="absolute top-0 left-0 w-40 h-40 bg-blue-200 opacity-20 rounded-full blur-2xl -z-10" />
           <div className="absolute bottom-0 right-0 w-40 h-40 bg-blue-300 opacity-10 rounded-full blur-2xl -z-10" />
           <div className="container flex flex-col items-center">
@@ -284,9 +284,9 @@ export default async function CountryHomePage({
                 Explore our latest features, offers, and updates designed to make your money transfers even better.
               </p>
             </div>
-            <div className="space-y-20 w-full max-w-6xl mx-auto">
+            <div className="space-y-20 w-full max-w-6xl mx-auto flex flex-col items-center">
               {banners.map((banner: any, index: number) => (
-                <div key={banner._key} className="transition-all duration-500 ease-in-out animate-fade-in-up">
+                <div key={banner._key} className="transition-all duration-500 ease-in-out animate-fade-in-up w-full flex justify-center">
                   <BannerCard
                     title={banner.title}
                     subtitle={banner.subtitle}
@@ -305,9 +305,9 @@ export default async function CountryHomePage({
       
       {/* Exchange Rates & Testimonials Section */}
       {(exchangeRates.length > 0 || testimonials.length > 0) && (
-        <section className="py-20 bg-white dark:bg-gray-950">
+        <section className="py-20 bg-white dark:bg-gray-950 flex flex-col items-center">
           <div className="container flex flex-col items-center">
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 w-full max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 w-full max-w-6xl mx-auto justify-items-center">
               {exchangeRates.length > 0 && (
                 <div className="lg:col-span-2 flex justify-center">
                   <ExchangeRateCard rates={exchangeRates} />
@@ -348,7 +348,7 @@ export default async function CountryHomePage({
       
       {/* Blog Section */}
       {blogPosts.length > 0 && (
-        <section className="py-20 bg-white dark:bg-gray-950">
+        <section className="py-20 bg-white dark:bg-gray-950 flex flex-col items-center">
           <div className="container flex flex-col items-center">
             <div className="text-center mb-14">
               <h2 className="text-3xl md:text-4xl font-bold text-blue-900 dark:text-white">Latest Articles</h2>
@@ -356,7 +356,7 @@ export default async function CountryHomePage({
                 Tips and insights about international money transfers
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 w-full max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 w-full max-w-6xl mx-auto justify-items-center">
               {blogPosts.map((post: any) => (
                 <BlogPreviewCard key={post._id} post={post} />
               ))}
