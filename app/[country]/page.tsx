@@ -274,20 +274,29 @@ export default async function CountryHomePage({
       
       {/* Banner Section */}
       {banners.length > 0 && (
-        <section className="py-20 bg-gradient-to-l from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
+        <section className="relative py-24 bg-gradient-to-l from-blue-100 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 overflow-hidden">
+          <div className="absolute top-0 left-0 w-40 h-40 bg-blue-200 opacity-20 rounded-full blur-2xl -z-10" />
+          <div className="absolute bottom-0 right-0 w-40 h-40 bg-blue-300 opacity-10 rounded-full blur-2xl -z-10" />
           <div className="container flex flex-col items-center">
+            <div className="mb-16 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-blue-900 dark:text-white mb-4">Discover More with Kyro</h2>
+              <p className="text-lg text-blue-700 dark:text-blue-200 max-w-2xl mx-auto">
+                Explore our latest features, offers, and updates designed to make your money transfers even better.
+              </p>
+            </div>
             <div className="space-y-20 w-full max-w-6xl mx-auto">
               {banners.map((banner: any, index: number) => (
-                <BannerCard
-                  key={banner._key}
-                  title={banner.title}
-                  subtitle={banner.subtitle}
-                  image={banner.image}
-                  ctaText={banner.ctaText}
-                  ctaLink={banner.ctaLink}
-                  backgroundColor={banner.backgroundColor}
-                  direction={index % 2 === 0 ? "row" : "row-reverse"}
-                />
+                <div key={banner._key} className="transition-all duration-500 ease-in-out animate-fade-in-up">
+                  <BannerCard
+                    title={banner.title}
+                    subtitle={banner.subtitle}
+                    image={banner.image}
+                    ctaText={banner.ctaText}
+                    ctaLink={banner.ctaLink}
+                    backgroundColor={banner.backgroundColor || 'linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%)'}
+                    direction={index % 2 === 0 ? "row" : "row-reverse"}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -320,12 +329,19 @@ export default async function CountryHomePage({
       
       {/* FAQs Section */}
       {faqs.length > 0 && (
-        <section className="py-20 bg-gradient-to-r from-blue-50 via-white to-blue-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-          <div className="container max-w-3xl flex flex-col items-center">
+        <section className="py-20 bg-gradient-to-r from-blue-50 via-white to-blue-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex flex-col items-center">
+          <div className="container max-w-2xl flex flex-col items-center">
             <div className="text-center mb-10">
-              <h2 className="text-2xl md:text-3xl font-bold text-blue-900 dark:text-white">Frequently Asked Questions</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-blue-900 dark:text-white mb-3">Frequently Asked Questions</h2>
+              <p className="text-lg text-blue-700 dark:text-blue-200 max-w-xl mx-auto">
+                Find answers to common questions about sending money, security, fees, and more.
+              </p>
             </div>
-            <FAQAccordion faqs={faqs} />
+            <div className="w-full flex flex-col items-center">
+              <div className="w-full max-w-xl min-w-[340px] md:min-w-[500px]">
+                <FAQAccordion faqs={faqs} />
+              </div>
+            </div>
           </div>
         </section>
       )}
@@ -356,3 +372,13 @@ export default async function CountryHomePage({
     </div>
   );
 }
+
+/* Add this to your global CSS for the fade-in-up animation: 
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(40px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+*/
