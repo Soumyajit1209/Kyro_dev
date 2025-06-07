@@ -44,40 +44,40 @@ export function Footer() {
 
   return (
     <footer className="bg-gray-100 dark:bg-gray-900">
-      <div className="container pt-12 pb-8">
+      <div className="container pt-12 pb-8 flex flex-col items-center">
         {/* Top section with columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="flex flex-col items-center w-full">
           {/* Brand column */}
-          <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="rounded-full bg-blue-600 p-1.5">
-                <Globe className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-xl font-bold tracking-tight">Kyro</span>
-            </Link>
-            <p className="mt-4 text-gray-600 dark:text-gray-400 text-sm">
-              Fast, secure, and affordable money transfers to over 100+ countries worldwide. Send money to your loved ones with confidence.
-            </p>
-            <div className="mt-6">
-              <p className="text-sm font-medium mb-2">Get the app</p>
-              <div className="flex space-x-3">
-                <Button variant="outline" size="sm" className="rounded-lg">
-                  App Store
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-lg">
-                  Google Play
-                </Button>
-              </div>
+          <Link href="/" className="flex items-center space-x-2 justify-center">
+            <div className="rounded-full bg-blue-600 p-1.5">
+              <Globe className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-xl font-bold tracking-tight">Kyro</span>
+          </Link>
+          <p className="mt-4 text-gray-600 dark:text-gray-400 text-sm text-center max-w-xl">
+            Fast, secure, and affordable money transfers to over 100+ countries worldwide. Send money to your loved ones with confidence.
+          </p>
+          <div className="mt-6 flex flex-col items-center">
+            <p className="text-sm font-medium mb-2">Get the app</p>
+            <div className="flex space-x-3">
+              <Button variant="outline" size="sm" className="rounded-lg">
+                App Store
+              </Button>
+              <Button variant="outline" size="sm" className="rounded-lg">
+                Google Play
+              </Button>
             </div>
           </div>
+        </div>
 
-          {/* Links columns */}
+        {/* Centralized links */}
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 justify-items-center text-center w-full max-w-4xl">
           <div>
             <h3 className="font-semibold mb-4">Company</h3>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.href}>
-                  <Link 
+                  <Link
                     href={link.href}
                     className="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 text-sm"
                   >
@@ -87,13 +87,12 @@ export function Footer() {
               ))}
             </ul>
           </div>
-          
           <div>
             <h3 className="font-semibold mb-4">Products</h3>
             <ul className="space-y-3">
               {footerLinks.products.map((link) => (
                 <li key={link.href}>
-                  <Link 
+                  <Link
                     href={link.href}
                     className="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 text-sm"
                   >
@@ -103,13 +102,12 @@ export function Footer() {
               ))}
             </ul>
           </div>
-          
           <div>
             <h3 className="font-semibold mb-4">Support</h3>
             <ul className="space-y-3">
               {footerLinks.support.map((link) => (
                 <li key={link.href}>
-                  <Link 
+                  <Link
                     href={link.href}
                     className="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 text-sm"
                   >
@@ -118,12 +116,13 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-            
-            <h3 className="font-semibold mt-6 mb-4">Legal</h3>
+          </div>
+          <div>
+            <h3 className="font-semibold mb-4">Legal</h3>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.href}>
-                  <Link 
+                  <Link
                     href={link.href}
                     className="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 text-sm"
                   >
@@ -134,12 +133,12 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        
-        <Separator className="my-8" />
-        
+
+        <Separator className="my-8 w-full max-w-4xl" />
+
         {/* Bottom section with social and copyright */}
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="flex space-x-4 mb-4 md:mb-0">
+        <div className="flex flex-col items-center w-full">
+          <div className="flex space-x-4 mb-4">
             {socialLinks.map((link) => (
               <a
                 key={link.href}
@@ -153,8 +152,7 @@ export function Footer() {
               </a>
             ))}
           </div>
-          
-          <div className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-sm text-gray-600 dark:text-gray-400 text-center">
             © {currentYear} Kyro. All rights reserved.
           </div>
         </div>

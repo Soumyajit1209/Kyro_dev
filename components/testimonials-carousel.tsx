@@ -50,7 +50,7 @@ export function TestimonialsCarousel({
   return (
     <div className={`relative w-full ${className}`}>
       <div className="flex justify-center">
-        <Card className="w-full max-w-3xl relative overflow-hidden">
+        <Card className="w-full max-w-3xl relative overflow-hidden dark:bg-gray-900">
           <CardContent className="p-6 md:p-8">
             <AnimatePresence mode="wait">
               <motion.div

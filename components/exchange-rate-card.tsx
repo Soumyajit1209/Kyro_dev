@@ -9,7 +9,7 @@ interface ExchangeRateCardProps {
 
 export function ExchangeRateCard({ rates, className }: ExchangeRateCardProps) {
   return (
-    <Card className={className}>
+    <Card className={`dark:bg-gray-900 ${className || ''}`}>
       <CardHeader>
         <CardTitle className="text-xl">Today's Exchange Rates</CardTitle>
       </CardHeader>

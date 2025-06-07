@@ -413,7 +413,7 @@ export default async function SendMoneyPage({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="flex items-center mb-6 text-sm">
-                <Link href={`/${sourceCountryCode}`} className="text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                <Link href={`/${sourceCountryCode}`} className="text-white hover:text-blue-600 transition-colors duration-200">
                   {sourceCountry.name}
                 </Link>
                 <ArrowRight className="h-4 w-4 mx-2 text-gray-400" />
@@ -464,7 +464,7 @@ export default async function SendMoneyPage({
               </div>
               
               <div className="flex flex-col sm:flex-row gap-6">
-                <Button asChild size="lg" className="text-lg px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg">
+                <Button asChild size="lg" className="text-lg text-white px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg">
                   <Link href="#calculator">
                     {pageData.hero?.ctaText || 'Send Money Now'}
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -656,7 +656,7 @@ export default async function SendMoneyPage({
                 <div className="md:text-right md:pr-8 order-2 md:order-1">
                   <h3 className="text-2xl font-semibold mb-4">Pay & Send</h3>
                   <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-                    Complete your payment and we'll send your money securely
+                    Complete your payment and we&apos;ll send your money securely
                   </p>
                 </div>
                 

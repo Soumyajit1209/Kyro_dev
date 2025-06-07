@@ -15,11 +15,9 @@ import { homePageQuery, blogPostsQuery, countriesListQuery } from "@/lib/queries
 import { getCountryByCode } from "@/data/countries";
 import { HomePage, BlogPost } from "@/types";
 
-// Force dynamic rendering for real-time data
 export const dynamic = 'force-dynamic';
-export const revalidate = 0; // Disable ISR caching
+export const revalidate = 0
 
-// Generate static params for available countries only
 export async function generateStaticParams() {
   try {
     // Fetch available countries from Sanity CMS
@@ -205,57 +203,64 @@ export default async function CountryHomePage({
   };
   
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
       {/* Hero Section */}
-      <section className="pt-28 pb-16 md:pt-32 md:pb-20 bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-950">
-        <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div className="text-center lg:text-left">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+      <section className="pt-32 pb-2 md:pt-20 md:pb-8 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-200 opacity-30 rounded-full blur-3xl" />
+          <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-400 opacity-20 rounded-full blur-3xl" />
+        </div>
+        <div className="container relative z-10 flex flex-col items-center justify-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start w-full max-w-6xl mx-auto">
+            
+            <div className="text-center lg:text-center pt-20">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-blue-900 dark:text-white drop-shadow-lg">
                 {pageData.hero?.heading || `Send Money from ${country.name}`}
               </h1>
-              <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
+              <p className="text-2xl text-blue-700 dark:text-blue-200 mb-10 font-medium">
                 {pageData.hero?.subheading || `Transfer money internationally from ${country.name} with competitive rates and low fees`}
               </p>
-              <Button asChild size="lg" className="rounded-full px-8">
-                <Link href={pageData.hero?.ctaLink || `/${countryCode}/send-money`}>
-                  {pageData.hero?.ctaText || "Get Started"}
-                </Link>
-              </Button>
+              <div className="flex justify-center">
+                <Button asChild size="lg" className="rounded-full px-10 py-5 text-lg shadow-lg">
+                  <Link href={pageData.hero?.ctaLink || `/${countryCode}/send-money`}>
+                    {pageData.hero?.ctaText || "Get Started"}
+                  </Link>
+                </Button>
+              </div>
             </div>
-            
-            <div className="flex justify-center lg:justify-end">
-              <CurrencyCalculator 
-                defaultSourceCountry={countryCode}
-                className="w-full max-w-md shadow-xl"
-              />
+            <div className="flex justify-center lg:justify-center">
+              <div className="bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-2xl p-6 w-full max-w-md backdrop-blur-md mx-auto">
+                <CurrencyCalculator 
+                  defaultSourceCountry={countryCode}
+                  className="w-full"
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
-      
+
       {/* Features Section */}
       {features.length > 0 && (
-        <section className="py-16 bg-white dark:bg-gray-950">
-          <div className="container">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold">Why Choose Kyro</h2>
-              <p className="text-gray-600 dark:text-gray-300 mt-2">
+        <section className="py-20 bg-gradient-to-r from-blue-100 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex flex-col items-center">
+          <div className="container flex flex-col items-center">
+            <div className="text-center mb-14">
+              <h2 className="text-3xl md:text-4xl font-bold text-blue-900 dark:text-white mb-2">Why Choose Kyro</h2>
+              <p className="text-lg text-blue-700 dark:text-blue-200 mt-2">
                 The smarter way to send money internationally
               </p>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 w-full max-w-6xl mx-auto justify-items-center">
               {features.map((feature: any, index: number) => (
                 <div 
                   key={index} 
-                  className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg text-center"
+                  className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg text-center border border-blue-100 dark:border-gray-800 hover:scale-105 transition-transform duration-200"
                 >
-                  <div className="flex justify-center mb-4">
+                  <div className="flex justify-center mb-5">
                     {iconComponents[feature.icon as keyof typeof iconComponents]}
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <h3 className="text-xl font-semibold mb-2 text-blue-800 dark:text-blue-200">{feature.title}</h3>
+                  <p className="text-blue-700 dark:text-blue-300">
                     {feature.description}
                   </p>
                 </div>
@@ -267,39 +272,55 @@ export default async function CountryHomePage({
       
       {/* Banner Section */}
       {banners.length > 0 && (
-        <section className="py-16 bg-gray-50 dark:bg-gray-900">
-          <div className="container space-y-16">
-            {banners.map((banner: any, index: number) => (
-              <BannerCard
-                key={banner._key}
-                title={banner.title}
-                subtitle={banner.subtitle}
-                image={banner.image}
-                ctaText={banner.ctaText}
-                ctaLink={banner.ctaLink}
-                backgroundColor={banner.backgroundColor}
-                direction={index % 2 === 0 ? "row" : "row-reverse"}
-              />
-            ))}
+        <section className="relative py-24 bg-gradient-to-l from-blue-100 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 overflow-hidden flex flex-col items-center">
+          <div className="absolute top-0 left-0 w-40 h-40 bg-blue-200 opacity-20 rounded-full blur-2xl -z-10" />
+          <div className="absolute bottom-0 right-0 w-40 h-40 bg-blue-300 opacity-10 rounded-full blur-2xl -z-10" />
+          <div className="container flex flex-col items-center">
+            <div className="mb-16 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-blue-900 dark:text-white mb-4">Discover More with Kyro</h2>
+              <p className="text-lg text-blue-700 dark:text-blue-200 max-w-2xl mx-auto">
+                Explore our latest features, offers, and updates designed to make your money transfers even better.
+              </p>
+            </div>
+            <div className="space-y-20 w-full max-w-6xl mx-auto flex flex-col items-center">
+              {banners.map((banner: any, index: number) => (
+                <div
+                  key={banner._key}
+                  className="transition-all duration-500 ease-in-out animate-fade-in-up w-full flex justify-center"
+                >
+                  <div className="w-full rounded-3xl bg-white/60 dark:bg-gray-900 shadow-2xl border border-blue-100 dark:border-gray-800 backdrop-blur-lg p-2 md:p-4 hover:scale-[1.02] hover:shadow-3xl transition-transform duration-300">
+                    <BannerCard
+                      title={banner.title}
+                      subtitle={banner.subtitle}
+                      image={banner.image}
+                      ctaText={banner.ctaText}
+                      ctaLink={banner.ctaLink}
+                      backgroundColor={banner.backgroundColor || 'linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%)'}
+                      direction={index % 2 === 0 ? "row" : "row-reverse"}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       )}
       
       {/* Exchange Rates & Testimonials Section */}
       {(exchangeRates.length > 0 || testimonials.length > 0) && (
-        <section className="py-16 bg-white dark:bg-gray-950">
-          <div className="container">
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <section className="py-20 bg-white dark:bg-gray-950 flex flex-col items-center">
+          <div className="container flex flex-col items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 w-full max-w-6xl mx-auto justify-items-center">
               {exchangeRates.length > 0 && (
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-2 flex justify-center">
                   <ExchangeRateCard rates={exchangeRates} />
                 </div>
               )}
               
               {testimonials.length > 0 && (
                 <div className={exchangeRates.length > 0 ? "lg:col-span-3" : "lg:col-span-5"}>
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold">What Our Customers Say</h2>
+                  <div className="text-center mb-10">
+                    <h2 className="text-2xl md:text-3xl font-bold text-blue-900 dark:text-white">What Our Customers Say</h2>
                   </div>
                   <TestimonialsCarousel testimonials={testimonials} />
                 </div>
@@ -311,32 +332,40 @@ export default async function CountryHomePage({
       
       {/* FAQs Section */}
       {faqs.length > 0 && (
-        <section className="py-16 bg-gray-50 dark:bg-gray-900">
-          <div className="container max-w-3xl">
-            <FAQAccordion faqs={faqs} />
+        <section className="py-20 bg-gradient-to-r from-blue-50 via-white to-blue-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex flex-col items-center">
+          <div className="container max-w-2xl flex flex-col items-center">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold text-blue-900 dark:text-white mb-3">Frequently Asked Questions</h2>
+              <p className="text-lg text-blue-700 dark:text-blue-200 max-w-xl mx-auto">
+                Find answers to common questions about sending money, security, fees, and more.
+              </p>
+            </div>
+            <div className="w-full flex flex-col items-center">
+              <div className="w-full max-w-xl min-w-[340px] md:min-w-[500px]">
+                <FAQAccordion faqs={faqs} />
+              </div>
+            </div>
           </div>
         </section>
       )}
       
       {/* Blog Section */}
       {blogPosts.length > 0 && (
-        <section className="py-16 bg-white dark:bg-gray-950">
-          <div className="container">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold">Latest Articles</h2>
-              <p className="text-gray-600 dark:text-gray-300 mt-2">
+        <section className="py-20 bg-white dark:bg-gray-950 flex flex-col items-center">
+          <div className="container flex flex-col items-center">
+            <div className="text-center mb-14">
+              <h2 className="text-3xl md:text-4xl font-bold text-blue-900 dark:text-white">Latest Articles</h2>
+              <p className="text-lg text-blue-700 dark:text-blue-200 mt-2">
                 Tips and insights about international money transfers
               </p>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 w-full max-w-6xl mx-auto justify-items-center">
               {blogPosts.map((post: any) => (
                 <BlogPreviewCard key={post._id} post={post} />
               ))}
             </div>
-            
-            <div className="text-center mt-12">
-              <Button variant="outline" asChild>
+            <div className="text-center mt-14">
+              <Button variant="outline" asChild className="px-8 py-3 text-lg">
                 <Link href={`/${countryCode}/blog`}>View All Articles</Link>
               </Button>
             </div>
