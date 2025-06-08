@@ -1,10 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { ThemeProvider } from '@/components/theme-provider';
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
-import { Toaster } from '@/components/ui/toaster';
+import ClientLayout from '@/components/layout/client-layout';
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -90,19 +87,7 @@ export default function RootLayout({
         <meta name="color-scheme" content="dark light" />
       </head>
       <body className={`${inter.className} antialiased min-h-screen bg-background text-foreground`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange={false}
-        >
-          <div className="relative flex min-h-screen flex-col bg-background">
-            <Header />
-            <main className="flex-1 relative">{children}</main>
-            <Footer />
-          </div>
-          <Toaster />
-        </ThemeProvider>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

@@ -46,7 +46,7 @@ export function Header() {
     >
       <div className="container flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2">
+        <Link href="/" className="flex items-center space-x-2 px-3">
           <div className="rounded-full bg-blue-600 p-1.5">
             <Globe className="h-6 w-6 text-white" />
           </div>
